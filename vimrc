@@ -46,7 +46,7 @@
 "     > minibufexpl.vim - http://www.vim.org/scripts/script.php?script_id=159
 "       Makes it easy to get an overview of buffers:
 "           info -> :e ~/.vim_runtime/plugin/minibufexpl.vim
-"
+" 
 "     > bufexplorer - http://www.vim.org/scripts/script.php?script_id=42
 "       Makes it easy to switch between buffers:
 "           info -> :help bufExplorer
@@ -184,7 +184,6 @@ if has("gui_running")
 else
   colorscheme zellner
   set background=dark
-  
   set nonu
 endif
 
@@ -342,6 +341,10 @@ endfunc
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Moving around, tabs and buffers
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"Useful when moving accross long lines
+map j gj
+map k gk
+
 " Map space to / (search) and c-space to ? (backgwards search)
 map <space> /
 map <c-space> ?
@@ -400,6 +403,16 @@ try
 catch
 endtry
 
+" Return to last edit position (You want this!) *N*
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif
+
+
+"Remeber open buffers on close
+set viminfo^=%
+
 
 """"""""""""""""""""""""""""""
 " => Statusline
@@ -407,23 +420,28 @@ endtry
 " Always hide the statusline
 set laststatus=2
 
-" Format the statusline
-set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{CurDir()}%h\ \ \ Line:\ %l/%L:%c
-
+"Git branch
+function! GitBranch()
+    let branch = system("git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* //'")
+    if branch != ''
+        return '   Git Branch: ' . substitute(branch, '\n', '', 'g')
+    en
+    return ''
+endfunction
 
 function! CurDir()
-    let curdir = substitute(getcwd(), '/Users/amir/', "~/", "g")
-    return curdir
+    return substitute(getcwd(), '/Users/amir/', "~/", "g")
 endfunction
 
 function! HasPaste()
     if &paste
         return 'PASTE MODE  '
-    else
-        return ''
-    endif
+    en
+    return ''
 endfunction
 
+" Format the statusline
+set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{CurDir()}%h\ \ \ Line:\ %l/%L%{GitBranch()}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Parenthesis/bracket expanding
@@ -495,25 +513,26 @@ map <leader>p :cp<cr>
 """"""""""""""""""""""""""""""
 let g:bufExplorerDefaultHelp=0
 let g:bufExplorerShowRelativePath=1
-map <leader>o :BufExplorer<cr>/
+let g:bufExplorerFindActive=1
+let g:bufExplorerSortBy='name'
+map <leader>o :BufExplorer<cr>
 
 
 """"""""""""""""""""""""""""""
 " => Minibuffer plugin
 """"""""""""""""""""""""""""""
 let g:miniBufExplModSelTarget = 1
-let g:miniBufExplorerMoreThanOne = 2
+let g:miniBufExplorerMoreThanOne = 0
 let g:miniBufExplModSelTarget = 0
 let g:miniBufExplUseSingleClick = 1
 let g:miniBufExplMapWindowNavVim = 1
-let g:miniBufExplVSplit = 25
+let g:miniBufExplVSplit = 30
 let g:miniBufExplSplitBelow=1
-
-let g:bufExplorerSortBy = "name"
 
 autocmd BufRead,BufNew :call UMiniBufExplorer
 
 map <leader>u :TMiniBufExplorer<cr>
+
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -619,4 +638,11 @@ map <leader>bb :cd ..<cr>
 
 map <leader>ct :cd ~/Desktop/Todoist/todoist<cr>
 map <leader>cw :cd ~/Desktop/Wedoist/wedoist<cr>
-map <leader>cp :cd ~/Desktop/Plurk/trunk/plurk<cr>
+map <leader>cp :cd ~/Desktop/PlurkGit/trunk<cr>
+
+if MySys() == "mac"
+    if has("gui_running")
+      set fuoptions=maxvert,maxhorz
+      au GUIEnter * set fullscreen
+    endif
+endif

@@ -148,7 +148,7 @@ site-install-rb: install-rb
 .c.o:
 	$(CC) $(INCFLAGS) $(CPPFLAGS) $(CFLAGS) -c $<
 
-$(DLLIB): $(OBJS)
+$(DLLIB): $(OBJS) Makefile
 	@-$(RM) $@
 	$(LDSHARED) -o $@ $(OBJS) $(LIBPATH) $(DLDFLAGS) $(LOCAL_LIBS) $(LIBS)
 
@@ -178,4 +178,4 @@ $(DLLIB): $(OBJS)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-CFLAGS += -std=gnu99 -Wall -Wextra -Wno-unused-parameter
+CFLAGS += -std=c99 -Wall -Wextra -Wno-unused-parameter
