@@ -404,14 +404,14 @@ catch
 endtry
 
 " Return to last edit position (You want this!) *N*
-autocmd BufReadPost *
-     \ if line("'\"") > 0 && line("'\"") <= line("$") |
-     \   exe "normal! g`\"" |
-     \ endif
+"autocmd BufReadPost *
+"     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+"     \   exe "normal! g`\"" |
+"     \ endif
 
 
 "Remeber open buffers on close
-set viminfo^=%
+"set viminfo^=%
 
 
 """"""""""""""""""""""""""""""
@@ -422,10 +422,16 @@ set laststatus=2
 
 "Git branch
 function! GitBranch()
-    let branch = system("git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* //'")
+    try
+        let branch = system("git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* //'")
+    catch
+        return ''
+    endtry
+
     if branch != ''
         return '   Git Branch: ' . substitute(branch, '\n', '', 'g')
     en
+
     return ''
 endfunction
 
@@ -610,8 +616,8 @@ map <leader>f :MRU<CR>
 """"""""""""""""""""""""""""""
 let g:CommandTMaxHeight = 15
 set wildignore+=*.o,*.obj,.git,*.pyc
-noremap <leader>j :CommandT<cr>
 noremap <leader>y :CommandTFlush<cr>
+"noremap! <leader>j :PeepOpen<cr>
 
 
 """"""""""""""""""""""""""""""
